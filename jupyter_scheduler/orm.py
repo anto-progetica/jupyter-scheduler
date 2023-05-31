@@ -111,7 +111,7 @@ class JobDefinition(CommonColumns, Base):
 
 
 def create_tables(db_url, drop_tables=False):
-    engine = create_engine(db_url)
+    engine = create_engine(db_url, pool_size=1, pool_pre_ping=True)
     try:
         if drop_tables:
             Base.metadata.drop_all(engine)
@@ -122,7 +122,7 @@ def create_tables(db_url, drop_tables=False):
 
 
 def create_session(db_url):
-    engine = create_engine(db_url, echo=False)
+    engine = create_engine(db_url, echo=False,pool_size=1, pool_pre_ping=True)
     Session = sessionmaker(bind=engine)
 
     return Session
