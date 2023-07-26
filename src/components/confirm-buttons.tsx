@@ -1,23 +1,28 @@
-import { Box, Button, Chip, IconButton, SvgIconTypeMap } from '@mui/material';
+import { Box, Button, Chip, IconButton } from '@mui/material';
 import React, { useState } from 'react';
 import { useTranslator } from '../hooks';
 import CloseIcon from '@mui/icons-material/Close';
-import { OverridableComponent } from '@mui/material/OverridableComponent';
 
 export function ConfirmButton(props: {
   onConfirm: () => void;
   confirmationText: string;
-  icon:
-    | JSX.Element
-    | (OverridableComponent<SvgIconTypeMap<unknown, 'svg'>> & {
-        muiName: string;
-      });
+  icon?: JSX.Element;
   name?: string | undefined;
   remainAfterConfirmation?: boolean;
   remainText?: string;
 }): JSX.Element | null {
   const [clicked, setClicked] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
+
+  // For Safari compatibility, also apply this to the "mouseDown" event, since the
+  // "click" event doesn't fire when the user clicks or taps on a button made visible
+  // in this way
+  const clickHandler = (e: any) => {
+    props.onConfirm();
+    if (props.remainAfterConfirmation) {
+      setConfirmed(true);
+    }
+  };
 
   return (
     <Box sx={{ width: '6em' }}>
@@ -29,12 +34,8 @@ export function ConfirmButton(props: {
             variant="contained"
             color="error"
             title={props.name}
-            onClick={_ => {
-              props.onConfirm();
-              if (props.remainAfterConfirmation) {
-                setConfirmed(true);
-              }
-            }}
+            onClick={clickHandler}
+            onMouseDown={clickHandler}
             onBlur={_ => setClicked(false)}
             style={{ visibility: clicked ? 'visible' : 'hidden' }}
             autoFocus
